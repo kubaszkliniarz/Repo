@@ -1,0 +1,19 @@
+Jakub Szkliniarz, Informatyka i Ekonometria, niestacjonarnie, I rok.
+
+API Caller - obslugujacy notowania spółek giełdowych z S&P500.
+
+Zadaniem programu było ściągnięcie z często aktualizowanej, angielskiej wikipedii, tickerów oraz nazw spółek S&P500. Następnie wykonanie obliczeń, zaprezentowanie statystyk, a także dwóch najważniejszych wykresów - notowań, a także wolumenu w sposób łatwy do odczytania, a także z możliwością zauważenia zależności pomiędzy tymi dwoma.
+
+Projekt dzieli się na dwa pliki - program.py (główny), a także long_list.py (służący do pobrania listy ze spółkami).
+
+long_list.py - rozpoczynamy od scrape strony wikipedii, za pomocą wejścia na odpowiednią stronę, a następnie pobrania jej kodu źródłowego za pomocą funkcji bibliotecznej requests.get, po czym parsujemy za pomocą biblioteku beautifulsoap. Po przeanalizowaniu strony, można zauważyć, że nasza tabela znajduje się w klasie 'wikitable sortable', a każdy rekord znajduje się w osobnym <tr> </tr>, a każda komórka tabeli w osobnym <td>. Tak więc nasza struktura wygląda:
+rekord 1: <tr> <td>ticker</td> <td>nazwa spolki</td> ... </tr>
+Znajdujemy wiec interesujace nas elementy i zapisujemy do list. Listy musimy znormalizować, ze względu na występujące w nich spacje, które pozostawiają nam \n. Robimy to przy wykorzystaniu .replace. Następnie nasze tickery, oraz nazwy spółek zwracamy za pomocą słownika.
+
+program.py - rozpoczynamy od stworzenia naszego GUI za pomocą tkintera. Tworzymy odpowiednie napisy (Labele), dropdown listy i przyciski. W poprzedniej funkcji z long_list.py przekazywalismy slownik - ticker i company name. Zrobilismy to po to, aby uzytkownik w swoim dropdownie widział nie tickery, które często mogą być mylące, ale pełne nazwy spółek. Użytkownik po wybraniu spółki i okresu dla którego chce zobaczyć dane, ma możliwość zobaczenia statystyk, bądź wykresów. Po kliknięciu pierwszego przycisku, przechodzimy do funkcji download_history, która wylicza daty od-do, pobiera dane dla tego okresu czasu z yfinance, a następnie przechodzi do funckji calculations, która kolejno liczy średnie wolumenu i notowań spółki, procentową zmianę wartości spółki (ze wzoru: (zamknięcie_w_ostatni_dzień / zamknięcie_w_pierwszy_dzień ) - 1 ), odchylenie standardowe notowań, a także wartosci minimalne i maksymalne dla notowań i wolumenu. Wartości zostały zaokrąglone do 2 lub 3 miejsc po przecinku.
+Drugi przycisk służy do wygenerowania wykresów z biblioteki matplotlib. Stworzona została 'figura', a następnie dwa subploty, które dzielą ze sobą oś OX. Pozwala to użytkownikowi na dostrzeżenie zależności pomiędzy wolumenem, a notowaniem spółki. 
+Trzeci przycisk służy do skasowania ostatnich statystyk.
+
+Dropdowny są ustawione jako readonly, aby zminimalizować ryzyko wystąpienia błędu (gdy użytkownik wpiszę spółkę spoza listy), a jeśli spółka nie zostanie wybrania, to wyświetli się odpowiedni pop-up. Okres czasu jest domyślnie ustawiony na 2 tygodnie.
+
+Poleca się użycie najpierw przycisku Obliczenia, następnie Wykres, przeanalizowanie statystyk z wykresem, a po wyłączeniu okienka wykresu na ciśnięcie 3 przycisku w celu usunięcia niepotrzebnych nam już statystyk.
